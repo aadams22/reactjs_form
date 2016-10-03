@@ -60,10 +60,14 @@
             }
 
           },
+          capitalizeFirstLetter: function(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+          },
           handleSubmit: function(e) {
             e.preventDefault();
 
-            var firstName  = this.state.firstname.trim();
+            var firstName  = this.capitalizeFirstLetter(this.state.firstname.trim());
+            console.log(firstName);
             var email      = this.state.email.trim();
 
             if(email) { this.validateEmail(email); }
@@ -86,7 +90,7 @@
 
                   {this.state.success ? 
                     <UserData 
-                      firstname={this.state.firstname} 
+                      firstname={this.capitalizeFirstLetter(this.state.firstname)} 
                       email={this.state.email} /> :
 
                     <form onSubmit={ this.handleSubmit }>
