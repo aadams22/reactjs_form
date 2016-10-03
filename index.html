@@ -42,6 +42,8 @@
             if(this.state.isvalid) {
               this.setState({ failedInput: 'email', isvalid: false });
               console.log('state', this.state)
+            }else {
+              this.setState({ failedInput: '', isvalid: true });
             }
 
           },
@@ -51,10 +53,9 @@
             var t = /^[a-zA-Z]*$/.test(this.state.firstname);
 
             if(!t) {
-              this.setState({ 
-                failedInput: 'name',
-                isvalid: false
-               });
+              this.setState({ failedInput: 'name', isvalid: false });
+            }else {
+              this.setState({ failedInput: '', isvalid: true });
             }
 
           },
@@ -97,11 +98,6 @@
                       email={this.state.email} /> : null
                   }
 
-                  {!this.state.isvalid ? 
-                    <ValidationErr failedInput={this.state.failedInput} /> : null 
-                  }
-
-
                   {!this.state.success &&
                     <form onSubmit={ this.handleSubmit }>
                       <input type="text" 
@@ -118,6 +114,11 @@
                       <br /><br />
                       <input type="submit" value="Post" ></input>
                     </form>
+                  }
+
+
+                  {!this.state.isvalid ? 
+                    <ValidationErr failedInput={this.state.failedInput} /> : null 
                   }
 
                 </div>
@@ -148,7 +149,7 @@
         render: function() {
           return (
             <div id="error-handler" >
-              <p>Sorry! Something seems to have gone awry. Please enter your proper {this.props.failedInput}!</p>
+              <p>Oh no! Something seems to have gone dreadfully awry. Please enter your proper {this.props.failedInput}!</p>
             </div>
           )
         }
