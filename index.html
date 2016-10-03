@@ -4,22 +4,25 @@
   <link rel="stylesheet" type="text/css" href="./styles/main.css">
 </head>
 <body>
-
+<div id="error-handler"></div>
+<!-- <div id="user-data"></div> -->
 <div id="login-container"></div>
-<div id="user-data"></div>
 
     <script src="https://fb.me/react-15.0.0.js"></script>
     <script src="https://fb.me/react-dom-15.0.0.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
 
-      var data = [
-      ];
-
+      var data = [];
 
       var FormInput = React.createClass({
           getInitialState: function() {
-            return {firstname: '', email: ''};
+            return {
+              firstname: '', 
+              email: '',
+              success: false,
+              isValid: true
+            };
           },
           handleNameChange: function(e) {
             this.setState({firstname: e.target.value});
@@ -29,79 +32,144 @@
           },
           handleSubmit: function(e) {
             e.preventDefault();
+            this.setState({success: true});
+
+            console.log('validate email: ', this.validateEmail);
+            console.log(e.target.validate);
+
+
             var firstName  = this.state.firstname.trim();
-            var email = this.state.email.trim();
-            if(!firstName) { return; }
-            console.log('name: ', firstName);
-            console.log('email: ', email);
+            var email      = this.state.email.trim();
+
+            if(!firstName || !email ) { return; }
+
+
+            /*Normally an AJAX call would be here sending the data to the server, on success the data array would be updated, but since we're dealing with only 2 pieces of information and no db, no array or ajax call is necessary*/
+            data.push({'firstName': firstName, 'email': email});
+            console.log('data: ', data);
+
+            // resets inupts to empty values
+            // return this.setState({firstname: '', email: '', success: false});
           },
-          isEmpty: function() {
+          isEmpty: function(e) {
+            console.log('isEmpty');
             if (this.props.required && !this.props.value) {
               console.log('this.props.required && !this.props.value');
-              message = this.props.emptyMessage;
-              valid = false;
-              errorVisable = true;
+              validateForm(this.isEmpty)
+              return this.setState({ isValid: false});
             }
           },
           validateEmail: function(state) {
+            /*would probably use a stronger regex and include sending an email for physical validation*/
             return { email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(state.email) }
           },
           validateName: function(state) {
+            //tests for only letters in name. includes German characters
+            //!!need to include French and Spanish
             return { firstname: /[a-zA-ZäöüßÄÖÜ]/.test(state.firstname) }
           },
           render: function() {
               return (
-                <form onSubmit={ this.handleSubmit }>
+                <div>
 
+                  {this.state.success && 
+                    <UserData firstname={this.state.firstname} email={this.state.email} />
+                  }
+   
+                  {!this.state.success &&
+                    <form onSubmit={ this.handleSubmit }>
+                      <input type="text" 
+                              placeholder="Name"
+                              value={this.state.firstname} 
+                              validate={this.validateName}
+                              empty={this.isEmpty}                              
+                              onChange={this.handleNameChange}
+                              required />
+                      <br /><br />
+                      <input type="email" 
+                             placeholder="example@example.com"
+                             value={this.state.email}
+                             validate={this.validateEmail}
+                             empty={this.isEmpty} 
+                             onChange={this.handleEmailChange}
+                             required  />
+                      <br /><br />
+                      <input type="submit" value="Post"></input>
+                    </form>
+                  }
 
-                  <input type="text" 
-                          placeholder="Name"
-                          value={this.state.firstname} 
-                          errorMessage="Really buddy? Your name probably doesn't include numbers."
-                          emptyMessage="Sorry, but we need your name, mate."
-                          onChange={this.handleNameChange}
-                          required />
-                  <br /><br />
-                  <input type="email" 
-                         placeholder="example@example.com"
-                         validate={this.validateEmail}
-                         errorMessage="Oops! Try typing your email again."
-                         emptyMessage="Sorry, but we need your email, mate."
-                         value={this.state.email} 
-                         onChange={this.handleEmailChange}
-                         required  />
-                  <br /><br />
-                  <input type="submit" value="Post"></input>
-                </form>
+                </div>
+              
               );
           }
 
         });
       
 
-      var InputError = React.createClass({
-        getInitialState: function() {
-          console.log("input error");
-          return { message: 'The machine is perturbed. Something went awry.' };
-        },
+        ReactDOM.render(
+          <FormInput/>,
+          document.getElementById('login-container')
+        );
+
+
+
+
+      var UserData = React.createClass({
         render: function() {
-          var errorClass = classNames(this.props.className, {
-            'error_container': true,
-            'visible':         this.props.visible,
-            'invisible':       !this.props.visible
-          });
           return (
-            <div className={errorClass}>
-            <span>{this.props.errorMessage}</span>
+            <div id="user-data">
+              <h1>We appreciate your support!</h1>
+              <h2>{this.props.firstname}</h2>
+              <p>{this.props.email}</p>
             </div>
           )
         }
+
       });
 
-      ReactDOM.render(
-        <FormInput/>,
-        document.getElementById('login-container')
-      );
+
+
+
+
+        // ReactDOM.render(
+        //   <userData/>,
+        //   document.getElementById('user-data')
+        // );
+
+      // var validationErr = React.createClass({
+      //   getInitialState: function() {
+      //     return {
+      //       isValid: true
+      //     };
+      //   },
+      //   componentDidUpdate: function(e) {
+      //   var isValid = this.state.isValid;
+
+      //     if(!this.state.isValid) {
+      //       console.log('not valid');
+      //     }
+          
+      //   },
+      //   render: function() {
+      //     const isValid = this.state.isValid;
+
+      //     return (
+      //       <div id="user-data">
+      //         <p>Error: {this.props.emptyMessage}</p>
+      //       </div>
+      //     )
+      //   }
+      // });
+
+      //   ReactDOM.render(
+      //     <validationErr/>,
+      //     document.getElementById('error-handler')
+      //   );
+
+
+
+
+
 
 
 
