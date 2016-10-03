@@ -39,50 +39,37 @@
             //Tests for only letters in name. !!need to include languages other than english!
             var t = /^[a-zA-Z]*$/.test(this.state.firstname);
 
-            if(!t) {
-              this.setState({ failedInput: 'name', isvalid: false });
-            }else {
-              this.setState({ failedInput: '', isvalid: true });
-            }
+            t ? this.setState({ failedInput: '', isvalid: true }) : this.setState({ failedInput: 'name', isvalid: false });
 
           },       
           validateEmail: function(state) {
             /*would probably use a stronger regex and include sending an email for physical validation*/
-            console.log("test: ", /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))
+            var t = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email);
 
-            console.log("email: ", this.state.email);
-
-            if(this.state.isvalid) {
-              this.setState({ failedInput: 'email', isvalid: false });
-              console.log('state', this.state)
-            }else {
-              this.setState({ failedInput: '', isvalid: true });
-            }
+            /*if the test is succeeds then the failedInput is set to empty in order to eliminate the box from the dom after the user has corrected their mistake the isvalid value is then set to true if the test fails, the error message is given a error to tell user what went wrong. the input is no longer valid*/
+            t ? this.setState({ failedInput: '', isvalid: true }) : his.setState({ failedInput: 'email', isvalid: false });
 
           },
           capitalizeFirstLetter: function(string) {
+            //sets user's input value to uppercase for grammar's sake by
             return string.charAt(0).toUpperCase() + string.slice(1);
           },
           handleSubmit: function(e) {
             e.preventDefault();
 
+            //sets user input to variables
             var firstName  = this.capitalizeFirstLetter(this.state.firstname.trim());
-            console.log(firstName);
             var email      = this.state.email.trim();
 
+            //validates email address and initiates error box
             if(email) { this.validateEmail(email); }
 
             /*Normally an AJAX call would be here sending the data to the server, on success the data array would be updated, but since we're dealing with only 2 pieces of information and no db, no array or ajax call is necessary*/
-
             if(this.state.isvalid) {
               data.push({'firstName': firstName, 'email': email});
-              console.log('data: ', data); 
               this.setState({success: true}); 
             }
 
-
-            /*on a successful ajax call, this should be the final code to reset inupts to their original values
-            return this.setState({firstname: '', email: '', success: false});*/
           },
           render: function() {
               return (
