@@ -26,25 +26,22 @@
           },
           handleNameChange: function(e) {
             this.setState({firstname: e.target.value});
-
+            //if the value is not null, run instant validation while user is typing
             if(e.target.value){
               this.validateName(e.target.value)
             }
-            
-            console.log("target: ", e.target.value );
 
           },
           handleEmailChange: function(e) {
             this.setState({email: e.target.value});
-            // this.validateEmail(e.target.value)
           },       
           validateEmail: function(state) {
             /*would probably use a stronger regex and include sending an email for physical validation*/
-            console.log("email test: ", /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(state.email))
+            console.log("test: ", /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))
 
             if(this.state.isvalid) {
-              console.log('state', this.state)
               this.setState({ failedInput: 'email', isvalid: false });
+              console.log('state', this.state)
             }
 
           },
@@ -52,14 +49,12 @@
             //Tests for only letters in name. !!need to include languages other than english!
 
             var t = /^[a-zA-Z]*$/.test(this.state.firstname);
-            console.log('test: ', t);
 
             if(!t) {
               this.setState({ 
                 failedInput: 'name',
                 isvalid: false
                });
-              console.log('state', this.state)
             }
 
           },
@@ -70,6 +65,9 @@
             var firstName  = this.state.firstname.trim();
             var email      = this.state.email.trim();
 
+            if(email) {
+              this.validateEmail(email);
+            }
 
             /*Normally an AJAX call would be here sending the data to the server, on success the data array would be updated, but since we're dealing with only 2 pieces of information and no db, no array or ajax call is necessary*/
 
@@ -109,7 +107,8 @@
                       <input type="text" 
                               placeholder="Name"
                               value={this.state.firstname}                         
-                              onChange={this.handleNameChange} />
+                              onChange={this.handleNameChange}
+                              required />
                       <br /><br />
                       <input type="email" 
                              placeholder="example@example.com"
