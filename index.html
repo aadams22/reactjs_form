@@ -26,8 +26,13 @@
           },
           handleNameChange: function(e) {
             this.setState({firstname: e.target.value});
-            console.log("target: ", e.target.value )
-            this.validateName(e.target.value)
+
+            if(e.target.value.length > 2){
+              this.validateName(e.target.value)
+            }
+            
+            console.log("target: ", e.target.value );
+
           },
           handleEmailChange: function(e) {
             this.setState({email: e.target.value});
@@ -35,22 +40,27 @@
           },       
           validateEmail: function(state) {
             /*would probably use a stronger regex and include sending an email for physical validation*/
-            return { isvalid: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(state.email) }
-          },
-          validateName: function(state) {
-            //Tests for only letters in name. Includes German characters
-            //!!need to include French and Spanish
+            console.log("email test: ", /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(state.email))
 
-            console.log('test: ', /^[a-z]+$/i.test(state.firstname));
-            // this.setState({ valid: /[a-zA-ZäöüßÄÖÜ]/.test(firstName) });
             if(this.state.isvalid) {
-              console.log('isvalid', this.state)
-              this.setState({ failedInput: 'name' });
+              console.log('state', this.state)
+              this.setState({ failedInput: 'email', isvalid: false });
             }
 
-            console.log('failedInput: ', this.state);
-  
-            // return { isvalid: /[a-zA-ZäöüßÄÖÜ]/.test(state.firstname) };           
+          },
+          validateName: function(state) {
+            //Tests for only letters in name. !!need to include languages other than english!
+
+            var t = /^[a-zA-Z]*$/.test(this.state.firstname);
+            console.log('test: ', t);
+
+            if(!t) {
+              this.setState({ 
+                failedInput: 'name',
+                isvalid: false
+               });
+              console.log('state', this.state)
+            }
 
           },
           handleSubmit: function(e) {
@@ -62,11 +72,13 @@
 
 
             /*Normally an AJAX call would be here sending the data to the server, on success the data array would be updated, but since we're dealing with only 2 pieces of information and no db, no array or ajax call is necessary*/
-            if()
 
+
+            /*If the sate is valid after submit, then the data can be submited. The two are necessary to keep the form from submitting while the isvalid state is still true at the inital rendering*/
             if (this.state.isvalid) { this.setState({canSubmit: true}); }
 
-            if(this.state.isvalid && this.state.canSubmit) {
+
+            if(this.state.canSubmit) {
               data.push({'firstName': firstName, 'email': email});
               console.log('data: ', data); 
               this.setState({success: true}); 
@@ -139,7 +151,7 @@
         render: function() {
           return (
             <div id="error-handler" disabled={this.props.disabled}>
-              <p>Sorry! Something seems to have gone ascew. Please enter your proper {this.props.failedInput}</p>
+              <p>Sorry! Something seems to have gone ascew. Please enter your proper {this.props.failedInput}!</p>
             </div>
           )
         }
