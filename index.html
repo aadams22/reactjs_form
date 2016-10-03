@@ -27,7 +27,7 @@
           handleNameChange: function(e) {
             this.setState({firstname: e.target.value});
 
-            if(e.target.value.length > 2){
+            if(e.target.value){
               this.validateName(e.target.value)
             }
             
@@ -93,33 +93,31 @@
               return (
                 <div>
 
-                  {this.state.success && 
+                  {this.state.success ? 
                     <UserData 
                       firstname={this.state.firstname} 
-                      email={this.state.email} />
+                      email={this.state.email} /> : null
                   }
-   
-                  <ValidationErr failedInput={this.state.failedInput} disabled={this.state.isvalid}/>
+
+                  {!this.state.isvalid ? 
+                    <ValidationErr failedInput={this.state.failedInput} /> : null 
+                  }
 
 
                   {!this.state.success &&
                     <form onSubmit={ this.handleSubmit }>
                       <input type="text" 
                               placeholder="Name"
-                              value={this.state.firstname} 
-                              // validation={this.validateName}
-                              // empty={this.isEmpty}                         
+                              value={this.state.firstname}                         
                               onChange={this.handleNameChange} />
                       <br /><br />
                       <input type="email" 
                              placeholder="example@example.com"
                              value={this.state.email}
-                             // validation={this.validateEmail}
-                             // empty={this.isEmpty} 
                              onChange={this.handleEmailChange}
                              required  />
                       <br /><br />
-                      <input type="submit" value="Post"></input>
+                      <input type="submit" value="Post" ></input>
                     </form>
                   }
 
@@ -150,8 +148,8 @@
       var ValidationErr = React.createClass({
         render: function() {
           return (
-            <div id="error-handler" disabled={this.props.disabled}>
-              <p>Sorry! Something seems to have gone ascew. Please enter your proper {this.props.failedInput}!</p>
+            <div id="error-handler" >
+              <p>Sorry! Something seems to have gone awry. Please enter your proper {this.props.failedInput}!</p>
             </div>
           )
         }
