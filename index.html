@@ -20,13 +20,13 @@
               email: '',
               failedInput: '',
               isvalid: true,
-              canSubmit: false,
               success: false
             };
           },
           handleNameChange: function(e) {
             this.setState({firstname: e.target.value});
-            //if the value is not null, run instant validation while user is typing
+            /*if the value is not null, run instant validation while user is typing. 
+            could also put this validation function after submit to stay in format with how I'm validating the email*/
             if(e.target.value){
               this.validateName(e.target.value)
             }
@@ -34,10 +34,23 @@
           },
           handleEmailChange: function(e) {
             this.setState({email: e.target.value});
+          },
+          validateName: function(state) {
+            //Tests for only letters in name. !!need to include languages other than english!
+            var t = /^[a-zA-Z]*$/.test(this.state.firstname);
+
+            if(!t) {
+              this.setState({ failedInput: 'name', isvalid: false });
+            }else {
+              this.setState({ failedInput: '', isvalid: true });
+            }
+
           },       
           validateEmail: function(state) {
             /*would probably use a stronger regex and include sending an email for physical validation*/
             console.log("test: ", /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))
+
+            console.log("email: ", this.state.email);
 
             if(this.state.isvalid) {
               this.setState({ failedInput: 'email', isvalid: false });
@@ -47,47 +60,26 @@
             }
 
           },
-          validateName: function(state) {
-            //Tests for only letters in name. !!need to include languages other than english!
-
-            var t = /^[a-zA-Z]*$/.test(this.state.firstname);
-
-            if(!t) {
-              this.setState({ failedInput: 'name', isvalid: false });
-            }else {
-              this.setState({ failedInput: '', isvalid: true });
-            }
-
-          },
           handleSubmit: function(e) {
             e.preventDefault();
-
 
             var firstName  = this.state.firstname.trim();
             var email      = this.state.email.trim();
 
-            if(email) {
-              this.validateEmail(email);
-            }
+            if(email) { this.validateEmail(email); }
 
             /*Normally an AJAX call would be here sending the data to the server, on success the data array would be updated, but since we're dealing with only 2 pieces of information and no db, no array or ajax call is necessary*/
 
-
-            /*If the sate is valid after submit, then the data can be submited. The two are necessary to keep the form from submitting while the isvalid state is still true at the inital rendering*/
-            if (this.state.isvalid) { this.setState({canSubmit: true}); }
-
-
-            if(this.state.canSubmit) {
+            if(this.state.isvalid) {
               data.push({'firstName': firstName, 'email': email});
               console.log('data: ', data); 
               this.setState({success: true}); 
             }
 
 
-            /*on a successful ajax call, this should be the final code to reset inupts to empty values
+            /*on a successful ajax call, this should be the final code to reset inupts to their original values
             return this.setState({firstname: '', email: '', success: false});*/
           },
-          //I think I should refactor the conditional statemnts to be set as disabled classes
           render: function() {
               return (
                 <div>
@@ -95,10 +87,8 @@
                   {this.state.success ? 
                     <UserData 
                       firstname={this.state.firstname} 
-                      email={this.state.email} /> : null
-                  }
+                      email={this.state.email} /> :
 
-                  {!this.state.success &&
                     <form onSubmit={ this.handleSubmit }>
                       <input type="text" 
                               placeholder="Name"
@@ -109,13 +99,11 @@
                       <input type="email" 
                              placeholder="example@example.com"
                              value={this.state.email}
-                             onChange={this.handleEmailChange}
-                             required  />
+                             onChange={this.handleEmailChange} />
                       <br /><br />
                       <input type="submit" value="Post" ></input>
                     </form>
                   }
-
 
                   {!this.state.isvalid ? 
                     <ValidationErr failedInput={this.state.failedInput} /> : null 
@@ -128,7 +116,6 @@
 
         });
       
-
 
       var UserData = React.createClass({
         render: function() {
@@ -143,7 +130,6 @@
 
       });
  
-
 
       var ValidationErr = React.createClass({
         render: function() {
