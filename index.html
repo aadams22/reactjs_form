@@ -4,7 +4,6 @@
   <link rel="stylesheet" type="text/css" href="./styles/main.css">
 </head>
 <body>
-<div id="error-handler"></div>
 <div id="login-container"></div>
 
     <script src="https://fb.me/react-15.0.0.js"></script>
@@ -19,55 +18,65 @@
             return {
               firstname: '', 
               email: '',
-              success: false,
-              isValid: true
+              failedInput: '',
+              isvalid: true,
+              canSubmit: false,
+              success: false
             };
           },
           handleNameChange: function(e) {
             this.setState({firstname: e.target.value});
+            console.log("target: ", e.target.value )
+            this.validateName(e.target.value)
           },
           handleEmailChange: function(e) {
             this.setState({email: e.target.value});
+            // this.validateEmail(e.target.value)
+          },       
+          validateEmail: function(state) {
+            /*would probably use a stronger regex and include sending an email for physical validation*/
+            return { isvalid: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(state.email) }
+          },
+          validateName: function(state) {
+            //Tests for only letters in name. Includes German characters
+            //!!need to include French and Spanish
+
+            console.log('test: ', /^[a-z]+$/i.test(state.firstname));
+            // this.setState({ valid: /[a-zA-ZäöüßÄÖÜ]/.test(firstName) });
+            if(this.state.isvalid) {
+              console.log('isvalid', this.state)
+              this.setState({ failedInput: 'name' });
+            }
+
+            console.log('failedInput: ', this.state);
+  
+            // return { isvalid: /[a-zA-ZäöüßÄÖÜ]/.test(state.firstname) };           
+
           },
           handleSubmit: function(e) {
             e.preventDefault();
-            this.setState({success: true});
 
-            console.log('validate email: ', this.validateEmail);
-            console.log(this.validation.email);
 
             var firstName  = this.state.firstname.trim();
             var email      = this.state.email.trim();
 
-            if(!firstName || !email ) { return; }
-
 
             /*Normally an AJAX call would be here sending the data to the server, on success the data array would be updated, but since we're dealing with only 2 pieces of information and no db, no array or ajax call is necessary*/
-            if(isValid) {
-             data.push({'firstName': firstName, 'email': email});
-              console.log('data: ', data);             
+            if()
+
+            if (this.state.isvalid) { this.setState({canSubmit: true}); }
+
+            if(this.state.isvalid && this.state.canSubmit) {
+              data.push({'firstName': firstName, 'email': email});
+              console.log('data: ', data); 
+              this.setState({success: true}); 
             }
 
 
             /*on a successful ajax call, this should be the final code to reset inupts to empty values
             return this.setState({firstname: '', email: '', success: false});*/
           },
-          isEmpty: function(e) {
-            console.log('isEmpty');
-            if (this.props.required && !this.props.value) {
-              console.log('this.props.required && !this.props.value');
-              return this.setState({ isValid: false});
-            }
-          },
-          validateEmail: function(state) {
-            /*would probably use a stronger regex and include sending an email for physical validation*/
-            return { email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(state.email) }
-          },
-          validateName: function(state) {
-            //tests for only letters in name. includes German characters
-            //!!need to include French and Spanish
-            return { firstname: /[a-zA-ZäöüßÄÖÜ]/.test(state.firstname) }
-          },
+          //I think I should refactor the conditional statemnts to be set as disabled classes
           render: function() {
               return (
                 <div>
@@ -78,22 +87,23 @@
                       email={this.state.email} />
                   }
    
+                  <ValidationErr failedInput={this.state.failedInput} disabled={this.state.isvalid}/>
+
 
                   {!this.state.success &&
                     <form onSubmit={ this.handleSubmit }>
                       <input type="text" 
                               placeholder="Name"
                               value={this.state.firstname} 
-                              validation={this.validateName}
-                              empty={this.isEmpty}                         
-                              onChange={this.handleNameChange}
-                              required />
+                              // validation={this.validateName}
+                              // empty={this.isEmpty}                         
+                              onChange={this.handleNameChange} />
                       <br /><br />
                       <input type="email" 
                              placeholder="example@example.com"
                              value={this.state.email}
-                             validation={this.validateEmail}
-                             empty={this.isEmpty} 
+                             // validation={this.validateEmail}
+                             // empty={this.isEmpty} 
                              onChange={this.handleEmailChange}
                              required  />
                       <br /><br />
@@ -122,32 +132,24 @@
         }
 
       });
-
-      ReactDOM.render(
-        <FormInput/>,
-        document.getElementById('login-container')
-      );
-
-
+ 
 
 
       var ValidationErr = React.createClass({
-        getInitialState: function() {
-
-        },
-        componentDidUpdate: function(e) {
-
-        },
         render: function() {
-
           return (
-            <div id="user-data">
-              <p>Error: {this.props.emptyMessage}</p>
+            <div id="error-handler" disabled={this.props.disabled}>
+              <p>Sorry! Something seems to have gone ascew. Please enter your proper {this.props.failedInput}</p>
             </div>
           )
         }
       });
 
+
+      ReactDOM.render(
+        <FormInput/>,
+        document.getElementById('login-container')
+      );
 
       </script>
 </body>
